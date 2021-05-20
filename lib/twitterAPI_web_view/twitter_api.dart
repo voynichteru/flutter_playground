@@ -2,15 +2,16 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'params_enum.dart';
 
 class TwitterApiController {
   static const apiKey = 'd79yUOYr6b86C1tOZ4r3uHxs2';
   static const apiSecretKey =
       'UvhbVquuJppvyRfSWpjumuy7UGYDuJMocOhilBiafzTpYhDqoc';
 
-  Future<String> recentSearch(String searchWords) async {
+  Future<List<Map<String, String>>> recentSearch(String searchWords) async {
     if (searchWords.isEmpty) {
-      return '';
+      return [];
     }
     final base64encoded = base64.encode(latin1.encode('$apiKey:$apiSecretKey'));
 
@@ -54,7 +55,7 @@ class TwitterApiController {
         .subtract(const Duration(days: 1))
         .toIso8601String();
     final urlEx = Uri.parse(
-        'https://api.twitter.com/2/tweets/search/recent?query=$searchWords&tweet.fields=created_at,text&user.fields=id,name,username,profile_image_url');
+        'https://api.twitter.com/2/tweets/search/recent?query=$searchWords&expansions=author_id&tweet.fields=created_at,text,public_metrics&user.fields=id,name,username,profile_image_url');
     final url = Uri.https(
       'api.twitter.com',
       '/2/tweets/search/recent',
@@ -66,7 +67,7 @@ class TwitterApiController {
       },
     );
 
-    print(url.toString());
+    print(urlEx.toString());
     final result = await http.get(
       urlEx,
       headers: {'Authorization': 'Bearer ${oauthToken.accessToken}'},
@@ -77,18 +78,76 @@ class TwitterApiController {
     print(result.body);
 
     final jsonString = json.decode(result.body) as Map<String, dynamic>;
+    final lists = List.generate(10, (index) => <String, String>{});
 
     for (final key in jsonString.keys) {
       switch (key) {
         case 'data':
           print(key);
-          final list = List<Map<String, dynamic>>.from(
+          final dataObject = List<Map<String, dynamic>>.from(
               jsonString[key] as Iterable<dynamic>);
-          for (final tweet in list) {
+          for (final tweet in dataObject) {
+            final index = dataObject.indexOf(tweet);
+
             tweet.forEach((key, dynamic value) {
-              print('$key value:${value.toString()}');
+              if (key == RecentSearchParams.id.asString) {
+                lists[index][RecentSearchParams.id.asString] =
+                    tweet[RecentSearchParams.id.asString].toString();
+              } else if (key == RecentSearchParams.authorId.asString) {
+                lists[index][RecentSearchParams.authorId.asString] =
+                    tweet[RecentSearchParams.authorId.asString].toString();
+              } else if (key == RecentSearchParams.text.asString) {
+                lists[index][RecentSearchParams.text.asString] =
+                    tweet[RecentSearchParams.text.asString].toString();
+              } else if (key == RecentSearchParams.createdAt.asString) {
+                lists[index][RecentSearchParams.createdAt.asString] =
+                    tweet[RecentSearchParams.createdAt.asString].toString();
+              } else if (key == RecentSearchParams.publicMetrics.asString) {
+                final publicMetricsObject = value as Map<String, dynamic>;
+                publicMetricsObject.forEach((key, dynamic value) {
+                  if (key == RecentSearchParams.replyCount.asString) {
+                    lists[index][RecentSearchParams.replyCount.asString] =
+                        value.toString();
+                  } else if (key == RecentSearchParams.retweetCount.asString) {
+                    lists[index][RecentSearchParams.retweetCount.asString] =
+                        value.toString();
+                  } else if (key == RecentSearchParams.likeCount.asString) {
+                    lists[index][RecentSearchParams.likeCount.asString] =
+                        value.toString();
+                  }
+                });
+              } else {
+                print('ERROR:Unexpected field found inside data Object');
+                throw AssertionError('Unexpected type: $this}');
+              }
+
+              /* for (final list in lists[index]) {
+                print('list index num : ${lists[index].length}');
+                print('${lists[index].indexOf(list)}:$list');
+              } */
             });
           }
+          break;
+        case 'includes':
+          print(key);
+          final includesObject =
+              Map<String, dynamic>.from(jsonString[key] as Map);
+          includesObject.forEach((key, dynamic value) {
+            print(key);
+            if (key == 'users') {
+              for (final userData in value as List) {
+                final index = value.indexOf(userData);
+                print(userData.toString());
+                lists[index][RecentSearchParams.name.asString] =
+                    userData[RecentSearchParams.name.asString].toString();
+                lists[index][RecentSearchParams.userName.asString] =
+                    userData[RecentSearchParams.userName.asString].toString();
+                lists[index][RecentSearchParams.profileImageUrl.asString] =
+                    userData[RecentSearchParams.profileImageUrl.asString]
+                        .toString();
+              }
+            }
+          });
           break;
         case 'meta':
           print(key);
@@ -97,11 +156,22 @@ class TwitterApiController {
             print('$key ${value.toString()}');
           });
           break;
-        case 'includes':
+        default:
+          print('Unexpected Object Found');
+          throw AssertionError('Unexpected type: $this}');
+      }
+    }
+    print('listsLength -> ${lists.length}');
+    for (var list in lists) {
+      print('listLength : ${list.length}');
+      var i = 0;
+      for (var value in list.values) {
+        print('$i : $value');
+        i++;
       }
     }
 
-    return 'YO';
+    return lists;
   }
 }
 

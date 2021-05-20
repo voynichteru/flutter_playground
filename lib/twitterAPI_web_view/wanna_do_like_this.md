@@ -12,6 +12,6 @@
 <div align="center">
 <img src="../../assets/images/twitter_api_webview/twitter_trends_view_in_app.jpg" alt="属性" title="twitter trends in app">
 <img src="../../assets/images/twitter_api_webview/twitter_trends_view_in_app3.jpg" alt="属性" title="twitter trends in app">
-<img src="../../assets/images/twitter_api_webview/**twitter_trends_view_in_app2.jpg" alt="属性" title="twitter trends in app">
+<img src="../../assets/images/twitter_api_webview/twitter_trends_view_in_app2.jpg" alt="属性" title="twitter trends in app">
 </div>
 
