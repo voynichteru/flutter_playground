@@ -35,107 +35,139 @@ class TweetTile extends StatelessWidget {
     final difference = DateTime.now().difference(DateTime.parse(createdAt));
     return Container(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 45,
-              maxHeight: 45,
-            ),
-            child: CachedNetworkImage(
-              imageUrl: profileImageUrl,
-              imageBuilder: (_, imageProvider) {
-                return GestureDetector(
-                  onTap: () {
-                    // launch url
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width / 10,
+                  maxHeight: MediaQuery.of(context).size.width / 10,
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: profileImageUrl,
+                  imageBuilder: (_, imageProvider) {
+                    return GestureDetector(
+                      onTap: () {
+                        // launch url
+                      },
+                      child: Image(
+                        image: imageProvider,
+                      ),
+                    );
                   },
-                  child: Image(
-                    image: imageProvider,
-                  ),
-                );
-              },
+                ),
+              ),
             ),
           ),
-          /* Column(
-            children: [
-              Text(text),
-              Row(
-                children: [
-                  SizedBox(
-                    child: GestureDetector(
-                      onTap: () {
-                        // launch url
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(Icons.ac_unit),
-                          Text(' $userName'),
-                        ],
-                      ),
+          Flexible(
+            flex: 5,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: Text(
+                    text,
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.9,
+                  ),
+                  child: SizedBox(
+                    /* width: MediaQuery.of(context).size.width * 0.9, */
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          child: GestureDetector(
+                            onTap: () {
+                              // launch url
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(Icons.ac_unit),
+                                Text(
+                                  ' $name',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        SizedBox(
+                          child: GestureDetector(
+                            onTap: () {
+                              // launch url
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(Icons.terrain),
+                                Text(
+                                  ' @$userName',
+                                  style: const TextStyle(fontSize: 14),
+                                  overflow: TextOverflow.fade,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(
-                    child: GestureDetector(
-                      onTap: () {
-                        // launch url
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(Icons.terrain),
-                          Text(' @$name'),
-                        ],
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      child: GestureDetector(
+                        onTap: () {
+                          // url launcher
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(Icons.messenger),
+                            Text(' $replyCount'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    child: GestureDetector(
-                      onTap: () {
-                        // url launcher
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(Icons.messenger),
-                          Text(' $replyCount'),
-                        ],
+                    SizedBox(
+                      child: GestureDetector(
+                        onTap: () {
+                          // url launcher
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(Icons.loop),
+                            Text(' $retweetCount'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    child: GestureDetector(
-                      onTap: () {
-                        // url launcher
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(Icons.loop),
-                          Text(' $retweetCount'),
-                        ],
+                    SizedBox(
+                      child: GestureDetector(
+                        onTap: () {
+                          // url launcher
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(Icons.favorite),
+                            Text(' $likeCount'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    child: GestureDetector(
-                      onTap: () {
-                        // url launcher
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(Icons.favorite),
-                          Text(' $likeCount'),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    child: Text(' ${difference.inHours.toString()}時間前'),
-                  )
-                ],
-              ),
-            ],
-          ) */
+                    SizedBox(
+                      child: Text(' ${difference.inHours.toString()}時間前'),
+                    )
+                  ],
+                ),
+                const Divider(),
+              ],
+            ),
+          )
         ],
       ),
     );

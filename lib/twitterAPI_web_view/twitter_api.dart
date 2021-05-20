@@ -97,8 +97,9 @@ class TwitterApiController {
                 lists[index][RecentSearchParams.authorId.asString] =
                     tweet[RecentSearchParams.authorId.asString].toString();
               } else if (key == RecentSearchParams.text.asString) {
-                lists[index][RecentSearchParams.text.asString] =
-                    tweet[RecentSearchParams.text.asString].toString();
+                final modifiedText =
+                    tweet[RecentSearchParams.text.asString].toString().trim();
+                lists[index][RecentSearchParams.text.asString] = modifiedText;
               } else if (key == RecentSearchParams.createdAt.asString) {
                 lists[index][RecentSearchParams.createdAt.asString] =
                     tweet[RecentSearchParams.createdAt.asString].toString();
@@ -164,11 +165,8 @@ class TwitterApiController {
     print('listsLength -> ${lists.length}');
     for (var list in lists) {
       print('listLength : ${list.length}');
-      var i = 0;
-      for (var value in list.values) {
-        print('$i : $value');
-        i++;
-      }
+
+      print(list['text']);
     }
 
     return lists;

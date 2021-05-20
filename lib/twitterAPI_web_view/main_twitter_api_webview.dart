@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'twitter_api.dart';
 import 'tweet_tile.dart';
+import 'twitter_api.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,19 +14,49 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
+      home: MainScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
+class MainScreen extends StatelessWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('twitter API brahbrah'),
+      ),
+      body: ListView(
+        children: [
+          ListTile(
+            title: const Text('Recent Search'),
+            onTap: () {
+              Navigator.of(context)
+                  .push<void>(MaterialPageRoute(builder: (context) {
+                return const RecentSearch();
+              }));
+            },
+          ),
+          const Divider(thickness: 2),
+          ListTile(
+            title: const Text('Trends and WebView'),
+            onTap: () {},
+          ),
+          const Divider(thickness: 2),
+        ],
+      ),
+    );
+  }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class RecentSearch extends StatefulWidget {
+  const RecentSearch({Key? key}) : super(key: key);
+
+  @override
+  _RecentSearchState createState() => _RecentSearchState();
+}
+
+class _RecentSearchState extends State<RecentSearch> {
   List<Map<String, String>> twitterPramLists = [];
   TwitterApiController twitterApiController = TwitterApiController();
 
