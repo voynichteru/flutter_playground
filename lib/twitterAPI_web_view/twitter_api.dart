@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'api_key.dart';
 import 'locations_enum.dart';
 import 'params_enum.dart';
 
@@ -16,9 +17,6 @@ class OauthToken {
 }
 
 class TwitterApiController {
-  static const apiKey = '************************';
-  static const apiSecretKey = '++++++++++++++++++++++';
-
   Future<List<Map<String, String>>> recentSearch(String searchWords) async {
     if (searchWords.isEmpty) {
       return [];
