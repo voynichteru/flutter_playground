@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'locations_enum.dart';
 import 'tweet_tile.dart';
 import 'twitter_api.dart';
 
@@ -40,7 +41,12 @@ class MainScreen extends StatelessWidget {
           const Divider(thickness: 2),
           ListTile(
             title: const Text('Trends and WebView'),
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context)
+                  .push<void>(MaterialPageRoute(builder: (context) {
+                return const TwitterTrends();
+              }));
+            },
           ),
           const Divider(thickness: 2),
         ],
@@ -123,8 +129,83 @@ class _RecentSearchState extends State<RecentSearch> {
       ),
     );
   }
+}
 
-  /* Future<List<Widget>> _tweetsTlieBuilder(List<String> texts) async {
-    var result = <Widget>[];
-  } */
+class TwitterTrends extends StatefulWidget {
+  const TwitterTrends({Key? key}) : super(key: key);
+
+  @override
+  _TwitterTrendsState createState() => _TwitterTrendsState();
+}
+
+class _TwitterTrendsState extends State<TwitterTrends> {
+  String targetLocation = 'Trend検索をする地域を選択してください:)';
+  final locationList = [
+    Locations.tokyo.asString,
+    Locations.ny.asString,
+    Locations.london.asString,
+    Locations.berlin.asString,
+    Locations.rio.asString,
+    Locations.moscow.asString,
+    Locations.melbourne.asString,
+    Locations.beijing.asString,
+    Locations.rome.asString,
+    Locations.capeTown.asString,
+  ];
+
+  TwitterApiController twitterApiController = TwitterApiController();
+
+  Future<void> _chooseLocation() {
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: const Text('Choose Location'),
+          children: [
+            ...locationList.map((location) {
+              return SimpleDialogOption(
+                onPressed: () {
+                  setState(() {
+                    targetLocation = location;
+                  });
+                  Navigator.pop(context);
+                },
+                child: Text(location),
+              );
+            }),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Twitter Trends and WebView'),
+      ),
+      body: Column(
+        children: [
+          Container(
+            alignment: Alignment.center,
+            child: const Text(
+              'Choose Location :) ',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+          Flexible(
+            child: ElevatedButton(
+              onPressed: _chooseLocation,
+              child: Text(targetLocation),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text('Get Trends'),
+          )
+        ],
+      ),
+    );
+  }
 }
