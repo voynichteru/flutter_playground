@@ -17,6 +17,16 @@
 </div>
 
 いろいろいじったところ、ざっくり下記のようになりました。
+
+
+地域を選択して、トレンドを取得、タップするとそのトレンド検索の画面(webview)に移行します。
+
+<div align="center">
+<img src="../../assets/images/twitter_api_webview/twitter_trends.png" alt="属性" title="twitter trends in app">
+<img src="../../assets/images/twitter_api_webview/twitter_api_webview.png" alt="属性" title="twitter trends in app">
+</div>
+
+
 ## Fetch Twitter Trends thru Twitter API then display Twitter screen on Web-View
 
 

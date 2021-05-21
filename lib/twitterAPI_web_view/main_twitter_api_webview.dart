@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'locations_enum.dart';
 import 'tweet_tile.dart';
 import 'twitter_api.dart';
+import 'twitter_web_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -139,18 +141,18 @@ class TwitterTrends extends StatefulWidget {
 }
 
 class _TwitterTrendsState extends State<TwitterTrends> {
-  String targetLocation = 'Trend検索をする地域を選択してください:)';
+  Locations? targetLocation;
   final locationList = [
-    Locations.tokyo.asString,
-    Locations.ny.asString,
-    Locations.london.asString,
-    Locations.berlin.asString,
-    Locations.rio.asString,
-    Locations.moscow.asString,
-    Locations.melbourne.asString,
-    Locations.beijing.asString,
-    Locations.rome.asString,
-    Locations.capeTown.asString,
+    Locations.tokyo,
+    Locations.ny,
+    Locations.london,
+    Locations.berlin,
+    Locations.rio,
+    Locations.moscow,
+    Locations.melbourne,
+    Locations.seoul,
+    Locations.rome,
+    Locations.capeTown,
   ];
 
   TwitterApiController twitterApiController = TwitterApiController();
@@ -170,7 +172,7 @@ class _TwitterTrendsState extends State<TwitterTrends> {
                   });
                   Navigator.pop(context);
                 },
-                child: Text(location),
+                child: Text(location.asString),
               );
             }),
           ],
@@ -179,31 +181,88 @@ class _TwitterTrendsState extends State<TwitterTrends> {
     );
   }
 
+  List<String> trendList = [];
+
+  void _setResult(List<String> result) {
+    setState(() {
+      trendList = result;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Twitter Trends and WebView'),
       ),
-      body: Column(
+      body: ListView(
         children: [
-          Container(
-            alignment: Alignment.center,
-            child: const Text(
-              'Choose Location :) ',
-              style: TextStyle(fontSize: 18),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 8,
+              right: 8,
             ),
-          ),
-          Flexible(
             child: ElevatedButton(
               onPressed: _chooseLocation,
-              child: Text(targetLocation),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.orange,
+              ),
+              child: Text(
+                targetLocation?.asString ?? 'Choose Location :)',
+                style: const TextStyle(fontSize: 20),
+              ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {},
-            child: const Text('Get Trends'),
-          )
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 8,
+              right: 8,
+            ),
+            child: ElevatedButton(
+              onPressed: () async {
+                if (targetLocation == null) {
+                  await Fluttertoast.showToast(msg: 'Choose Location, pls ;)');
+                } else {
+                  final result = await twitterApiController
+                      .getTrendsByLocation(targetLocation!);
+                  _setResult(result);
+                }
+              },
+              child: const Text(
+                'Fetch Trend List thru Twitter API',
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ),
+          if (trendList.isNotEmpty)
+            ...trendList.map((trend) => Container(
+                  decoration: const BoxDecoration(
+                      border: Border(
+                    top: BorderSide(
+                      color: Colors.black45,
+                      width: 1,
+                    ),
+                  )),
+                  child: ListTile(
+                    onTap: () {
+                      final url = Uri.https(
+                        'twitter.com',
+                        '/search',
+                        <String, dynamic>{
+                          'q': trend,
+                          'src': 'typed_query',
+                        },
+                      );
+                      print(url.toString());
+                      Navigator.of(context)
+                          .push<void>(MaterialPageRoute(builder: (context) {
+                        return TwitterWebView(url.toString());
+                      }));
+                    },
+                    title: Text(trend),
+                  ),
+                )),
         ],
       ),
     );

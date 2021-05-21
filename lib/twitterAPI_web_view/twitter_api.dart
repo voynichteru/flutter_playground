@@ -2,12 +2,22 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'locations_enum.dart';
 import 'params_enum.dart';
 
+class OauthToken {
+  const OauthToken(this.tokenType, this.accessToken);
+  OauthToken.fromJson(Map<String, dynamic> json)
+      : tokenType = json['token_type'] as String,
+        accessToken = json['access_token'] as String;
+
+  final String tokenType;
+  final String accessToken;
+}
+
 class TwitterApiController {
-  static const apiKey = 'd79yUOYr6b86C1tOZ4r3uHxs2';
-  static const apiSecretKey =
-      'UvhbVquuJppvyRfSWpjumuy7UGYDuJMocOhilBiafzTpYhDqoc';
+  static const apiKey = '************************';
+  static const apiSecretKey = '++++++++++++++++++++++';
 
   Future<List<Map<String, String>>> recentSearch(String searchWords) async {
     if (searchWords.isEmpty) {
@@ -171,14 +181,73 @@ class TwitterApiController {
 
     return lists;
   }
-}
 
-class OauthToken {
-  const OauthToken(this.tokenType, this.accessToken);
-  OauthToken.fromJson(Map<String, dynamic> json)
-      : tokenType = json['token_type'] as String,
-        accessToken = json['access_token'] as String;
+  Future<List<String>> getTrendsByLocation(Locations location) async {
+    /// GET trends/closest
+    /// see : https://developer.twitter.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-closest
+    if (!Locations.values.contains(location)) {
+      return [];
+    }
+    final base64encoded = base64.encode(latin1.encode('$apiKey:$apiSecretKey'));
 
-  final String tokenType;
-  final String accessToken;
+    final response = await http.post(
+      Uri.https('api.twitter.com', '/oauth2/token'),
+      headers: {'Authorization': 'Basic $base64encoded'},
+      body: {'grant_type': 'client_credentials'},
+    );
+
+    print(response.body);
+
+    final oauthToken =
+        OauthToken.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+
+    final woied = location.getWoied;
+    final url = Uri.https(
+      'api.twitter.com',
+      '/1.1/trends/place.json',
+      <String, dynamic>{
+        'id': woied,
+      },
+    );
+    print(url.toString());
+
+    final result = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer ${oauthToken.accessToken}'},
+    ).catchError((dynamic e) {
+      print('ERROR:$e');
+    });
+    final jsonString = json.decode(result.body) as List;
+    print('list length : ${jsonString.length}');
+    final trends = <String>[];
+    for (final map in jsonString) {
+      map.forEach((dynamic key, dynamic value) {
+        print(key);
+        switch (key) {
+          case 'trends':
+            final trendList = (value as List)
+                .map((dynamic e) => e as Map<String, dynamic>)
+                .toList();
+            for (final trend in trendList) {
+              final name = trend['name'].toString();
+              trends.add(name);
+              final volume = trend['tweet_volume']?.toString();
+              print('name:$name, volume:$volume');
+            }
+            break;
+          case 'locations':
+            final info = (value as List)
+                .map((dynamic e) => e as Map<String, dynamic>)
+                .toList();
+            for (final map in info) {
+              final location = map['name'].toString();
+              print('location:$location');
+            }
+        }
+      });
+    }
+    print('trends length : ${trends.length}');
+
+    return trends;
+  }
 }
