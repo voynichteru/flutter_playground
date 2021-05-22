@@ -17,8 +17,8 @@ class OauthToken {
 
 class TwitterApiController {
   // put your own API key/secret key here :)
-  static const apiKey = '*************************';
-  static const apiSecretKey = '++++++++++++++++++++++++++++';
+  static const apiKey = '***********************';
+  static const apiSecretKey = '+++++++++++++++++++++++++++++';
 
   Future<List<Map<String, String>>> recentSearch(String searchWords) async {
     // GET/2/Tweets/search/recent

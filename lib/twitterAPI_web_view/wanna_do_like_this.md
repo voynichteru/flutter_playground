@@ -21,6 +21,8 @@ Twitter API docs -> https://developer.twitter.com/en/docs/twitter-api
 
 という流れだと思うのですが、今回はフロントでAPI叩いて整形しています。3枚目のスクショがwebviewで表示しているものですね。
 
+センシティブなアカウントとして認識されているとパラメータを設定しても、nullが帰ってくるようですね。
+
 ...... ところで、
 
 みんなのガッキーがお嫁に行きましたね ;)
@@ -34,6 +36,10 @@ Twitter API docs -> https://developer.twitter.com/en/docs/twitter-api
 
 いろいろいじったところ、ざっくり下記のようになりました。
 
+
+<div align="center">
+<img src="../../images/twitter_api/recent_search.gif" alt="属性" title="twitter trends in app">
+</div>
 
 
 
@@ -51,6 +57,5 @@ Twitter API docs -> https://developer.twitter.com/en/docs/twitter-api
 Recent Searchのほうはこんなかんじで、地域選択して
 
 <div align="center">
-<img src="../../images/twitter_api/twitter_trends.png" alt="属性" title="twitter trends in app">
-<img src="../../images/twitter_api/twitter_api_webview.png" alt="属性" title="twitter trends in app">
+<img src="../../images/twitter_api/trends.gif" alt="属性" title="twitter trends in app">
 </div>

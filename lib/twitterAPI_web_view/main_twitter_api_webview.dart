@@ -160,6 +160,7 @@ class _RecentSearchState extends State<RecentSearch> {
               child: const Text('Search'),
             ),
           ),
+          const SizedBox(height: 10),
           if (twitterPramLists.isNotEmpty)
             for (var list in twitterPramLists) TweetTile(list),
         ],
