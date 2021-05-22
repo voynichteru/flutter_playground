@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'api_key.dart';
 import 'locations_enum.dart';
 import 'params_enum.dart';
 
@@ -17,12 +16,19 @@ class OauthToken {
 }
 
 class TwitterApiController {
+  // put your own API key/secret key here :)
+  static const apiKey = '***********************';
+  static const apiSecretKey = '+++++++++++++++++++++++++++++';
+
   Future<List<Map<String, String>>> recentSearch(String searchWords) async {
+    // GET/2/Tweets/search/recent
+    // https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent
+
     if (searchWords.isEmpty) {
       return [];
     }
-    final base64encoded = base64.encode(latin1.encode('$apiKey:$apiSecretKey'));
 
+    final base64encoded = base64.encode(latin1.encode('$apiKey:$apiSecretKey'));
     final response = await http.post(
       Uri.https('api.twitter.com', '/oauth2/token'),
       headers: {'Authorization': 'Basic $base64encoded'},
@@ -33,51 +39,35 @@ class TwitterApiController {
 
     final oauthToken =
         OauthToken.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
-
-    final queryParameters = {
-      'query': [searchWords],
-      'tweet.fields': [
-        'created_at',
-        'text',
-      ],
-      'user.fields': [
-        'id',
-        'name',
-        'username',
-        'profile_image_url',
-      ],
-    };
-
-    // join request queryParameters
-    final params = queryParameters.entries.map((paramEntry) {
-      final value = paramEntry.value.join(',');
-      return '${paramEntry.key}=$value';
-    }).reduce((param1, param2) {
-      return '$param1&$param2';
-    });
-    print('params: $params');
-
-    // GET/2/Tweets/search/recent -> see:https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent
     final yesterday = DateTime.now()
         .toUtc()
         .subtract(const Duration(days: 1))
         .toIso8601String();
-    final urlEx = Uri.parse(
-        'https://api.twitter.com/2/tweets/search/recent?query=$searchWords&expansions=author_id&tweet.fields=created_at,text,public_metrics&user.fields=id,name,username,profile_image_url');
     final url = Uri.https(
       'api.twitter.com',
       '/2/tweets/search/recent',
       <String, dynamic>{
         'query': searchWords,
-        'tweet.fields': 'created_at,text',
-        'user.fields': 'id,name,username,profile_image_url',
+        'expansions': RecentSearchParams.authorId.asString,
+        'tweet.fields': [
+          RecentSearchParams.createdAt.asString,
+          RecentSearchParams.text.asString,
+          RecentSearchParams.publicMetrics.asString,
+        ].join(','),
+        'user.fields': [
+          RecentSearchParams.id.asString,
+          RecentSearchParams.name.asString,
+          RecentSearchParams.userName.asString,
+          RecentSearchParams.profileImageUrl.asString,
+        ].join(','),
         'start_time': yesterday,
       },
     );
 
-    print(urlEx.toString());
+    print(url.toString());
+
     final result = await http.get(
-      urlEx,
+      url,
       headers: {'Authorization': 'Bearer ${oauthToken.accessToken}'},
     ).catchError((dynamic e) {
       print('ERROR:$e');
@@ -96,7 +86,6 @@ class TwitterApiController {
               jsonString[key] as Iterable<dynamic>);
           for (final tweet in dataObject) {
             final index = dataObject.indexOf(tweet);
-
             tweet.forEach((key, dynamic value) {
               if (key == RecentSearchParams.id.asString) {
                 lists[index][RecentSearchParams.id.asString] =
@@ -129,11 +118,6 @@ class TwitterApiController {
                 print('ERROR:Unexpected field found inside data Object');
                 throw AssertionError('Unexpected type: $this}');
               }
-
-              /* for (final list in lists[index]) {
-                print('list index num : ${lists[index].length}');
-                print('${lists[index].indexOf(list)}:$list');
-              } */
             });
           }
           break;
@@ -170,19 +154,13 @@ class TwitterApiController {
           throw AssertionError('Unexpected type: $this}');
       }
     }
-    print('listsLength -> ${lists.length}');
-    for (var list in lists) {
-      print('listLength : ${list.length}');
-
-      print(list['text']);
-    }
 
     return lists;
   }
 
   Future<List<String>> getTrendsByLocation(Locations location) async {
-    /// GET trends/closest
-    /// see : https://developer.twitter.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-closest
+    /// GET trends/place
+    /// see : https://developer.twitter.com/en/docs/twitter-api/v1/trends/trends-for-location/api-reference/get-trends-place
     if (!Locations.values.contains(location)) {
       return [];
     }

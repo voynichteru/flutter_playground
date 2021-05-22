@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'locations_enum.dart';
 import 'tweet_tile.dart';
 import 'twitter_api.dart';
@@ -23,6 +24,48 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatelessWidget {
+  static const docsRecentSearch =
+      'https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent';
+  static const docsTrends =
+      'https://developer.twitter.com/en/docs/twitter-api/v1/trends/trends-for-location/api-reference/get-trends-place';
+
+  List<Widget> _createListTile(
+    BuildContext context,
+    String title,
+    Widget toScreen,
+    String docsUrl,
+  ) {
+    return [
+      ListTile(
+        leading: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxHeight: 30,
+              maxWidth: 30,
+            ),
+            child: Image.asset('images/twitter_api/twitter_logo.png')),
+        title: Text(title),
+        onTap: () {
+          Navigator.of(context)
+              .push<void>(MaterialPageRoute(builder: (context) {
+            return toScreen;
+          }));
+        },
+        trailing: IconButton(
+          icon: const Icon(Icons.info_outline),
+          onPressed: () async {
+            await canLaunch(docsUrl)
+                ? await launch(docsUrl)
+                : Fluttertoast.showToast(
+                    msg: 'Could not open dos URL, sorry ;(',
+                    toastLength: Toast.LENGTH_LONG,
+                  );
+          },
+        ),
+      ),
+      const Divider(thickness: 2),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,26 +74,18 @@ class MainScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          ListTile(
-            title: const Text('Recent Search'),
-            onTap: () {
-              Navigator.of(context)
-                  .push<void>(MaterialPageRoute(builder: (context) {
-                return const RecentSearch();
-              }));
-            },
+          ..._createListTile(
+            context,
+            'Recent Search',
+            const RecentSearch(),
+            docsRecentSearch,
           ),
-          const Divider(thickness: 2),
-          ListTile(
-            title: const Text('Trends and WebView'),
-            onTap: () {
-              Navigator.of(context)
-                  .push<void>(MaterialPageRoute(builder: (context) {
-                return const TwitterTrends();
-              }));
-            },
-          ),
-          const Divider(thickness: 2),
+          ..._createListTile(
+            context,
+            'Trends and Webview',
+            const TwitterTrends(),
+            docsTrends,
+          )
         ],
       ),
     );
@@ -80,7 +115,7 @@ class _RecentSearchState extends State<RecentSearch> {
     var searchWords = '';
     return Scaffold(
       appBar: AppBar(
-        title: const Text('twitter API and web view'),
+        title: const Text('Recent Search and URL launcher'),
       ),
       body: ListView(
         children: [
@@ -125,6 +160,7 @@ class _RecentSearchState extends State<RecentSearch> {
               child: const Text('Search'),
             ),
           ),
+          const SizedBox(height: 10),
           if (twitterPramLists.isNotEmpty)
             for (var list in twitterPramLists) TweetTile(list),
         ],
@@ -247,7 +283,7 @@ class _TwitterTrendsState extends State<TwitterTrends> {
                   child: ListTile(
                     onTap: () {
                       final url = Uri.https(
-                        'twitter.com',
+                        'mobile.twitter.com',
                         '/search',
                         <String, dynamic>{
                           'q': trend,
