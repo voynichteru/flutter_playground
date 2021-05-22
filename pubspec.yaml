@@ -22,5 +22,5 @@ dev_dependencies:
   pedantic_mono: any
 flutter:
   assets:     
-    - assets/images/
+   - images/twitter_api/twitter_logo.png
   uses-material-design: true
