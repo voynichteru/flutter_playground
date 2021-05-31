@@ -8,6 +8,11 @@
             "name": "twitter_api_webview",
             "request": "launch",
             "type": "dart"
+        },
+        {   "program": "lib/carousel_slider_with_indicator/main_carousel_slider.dart",
+            "name": "carousel_slider_with_indicator",
+            "request": "launch",
+            "type": "dart"
         }
     ]
 }
