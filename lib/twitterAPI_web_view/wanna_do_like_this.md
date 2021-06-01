@@ -1,6 +1,12 @@
 # Twitter API brah
 
 Twitter API docs -> https://developer.twitter.com/en/docs/twitter-api
+
+## 注意
+
+このプロジェクトを動かす場合はTwitter API keyを取得して貼り付けてください。
+
+
 ## Recent Search
 
 - GET /2/tweets/search/recent
