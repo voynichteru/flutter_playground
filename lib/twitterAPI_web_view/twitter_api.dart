@@ -102,14 +102,17 @@ class TwitterApiController {
                     tweet[RecentSearchParams.createdAt.asString].toString();
               } else if (key == RecentSearchParams.publicMetrics.asString) {
                 final publicMetricsObject = value as Map<String, dynamic>;
-                publicMetricsObject.forEach((key, dynamic value) {
-                  if (key == RecentSearchParams.replyCount.asString) {
+                publicMetricsObject.forEach((publicMetricsKey, dynamic value) {
+                  if (publicMetricsKey ==
+                      RecentSearchParams.replyCount.asString) {
                     lists[index][RecentSearchParams.replyCount.asString] =
                         value.toString();
-                  } else if (key == RecentSearchParams.retweetCount.asString) {
+                  } else if (publicMetricsKey ==
+                      RecentSearchParams.retweetCount.asString) {
                     lists[index][RecentSearchParams.retweetCount.asString] =
                         value.toString();
-                  } else if (key == RecentSearchParams.likeCount.asString) {
+                  } else if (publicMetricsKey ==
+                      RecentSearchParams.likeCount.asString) {
                     lists[index][RecentSearchParams.likeCount.asString] =
                         value.toString();
                   }
